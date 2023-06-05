@@ -5,8 +5,8 @@ const { md5 } = require("./util");
 async function initStruct() {
   await run(`CREATE TABLE IF NOT EXISTS movimento (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    utente STRING,
-    essercente STRING,
+    username STRING,
+    esercente STRING,
     importo REAL,
     data STRING
   )`);
@@ -16,7 +16,7 @@ async function initStruct() {
   )`);
   await run(`CREATE TABLE IF NOT EXISTS token (
     token STRING PRIMARY KEY,
-    utente STRING
+    username STRING
   )`);
 
   const [utente] = await smartSelect('utente');
