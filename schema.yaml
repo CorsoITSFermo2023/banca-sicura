@@ -25,9 +25,38 @@ paths:
                   saldo_corrente:
                     type: number
 
-  /movimenti:
+  /routerMovimenti/Movimenti:
     get:
       summary: "Lettura dei movimenti"
+      parameters:
+        - name: Data Da
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            responses:
+              "200":
+                description: "Risposta della richiesta lista Movimenti"
+                content:
+                  application/json:
+                   schema:
+                    title: Generated schema for Root
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                        esercente:
+                          type: string
+                        importo:
+                          type: number
+                        data:
+                          type: string
+              
+    patch:
+      summary: "Inserimento di movimento"
       parameters:
         - name: Data Da
           in: query
@@ -45,6 +74,7 @@ paths:
       responses:
         "204":
           description: "Risposta della richiesta Conferma Arruolamenti"
+       
 
 components:
   schemas:
