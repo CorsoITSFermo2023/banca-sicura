@@ -5,14 +5,22 @@ function md5(string) {
 }
 
 // generazione token
-function get_random(){
-  const Promise = new Promise (resolve,reject)
-  randomBytes(48, function(ex, buf) {
-  token = buf.toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
-});
+function get_random() {
+  const promise = new Promise((resolve, reject) => {
+    randomBytes(48, function (ex, buf) {
+      if (ex) {
+        reject(ex)
+      } else {
+        token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
+        resolve(token)
+      }
+
+    });
+  })
+ 
   
 }
 
 module.exports = {
-  md5,get_random
+  md5, get_random
 }
