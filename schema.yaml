@@ -1,0 +1,229 @@
+openapi: 3.0.0
+info:
+  version: "0.0.1"
+  title: "Banca sicura"
+  license:
+    name: MIT
+servers:
+  - url: 'http://localhost:3000'
+    description: Endpoint di sviluppo
+paths:
+  /saldo:
+    get:
+      summary: "Restituisce il saldo corrente"
+      responses:
+        "200":
+          description: "Risposta della richiesta lista AFT"
+          content:
+            application/json:
+              schema:
+                title: Generated schema for Root
+                type: object
+                required:
+                  - saldo_corrente
+                properties:
+                  saldo_corrente:
+                    type: number
+
+  /movimenti:
+    get:
+      summary: "Lettura dei movimenti"
+      parameters:
+        - name: Data Da
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      requestBody:
+        description: Contenuto richiesta di Conferma Arruolamenti
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfermaArruolamenti"
+      responses:
+        "204":
+          description: "Risposta della richiesta Conferma Arruolamenti"
+
+components:
+  schemas:
+    StatoPaziente:
+      enum:
+        - arruolato
+        - stadiato
+        - prenotato
+        - disarruolato
+    AFT:
+      type: object
+      required:
+        - id
+        - nome
+        - descrizione
+      properties:
+        id:
+          type: string
+          description: ID AFT
+        nome:
+          type: string
+          description: Nome AFT
+        descrizione:
+          type: string
+          description: Descrizione AFT
+    Medico:
+      type: object
+      required:
+        - regione_medico
+        - asl_medico
+        - cf_medico
+        - distretto_medico
+        - cod_regionale_medico
+      properties:
+        cf_medico:
+          type: string
+          description: Codice fiscale del medico
+        regione_medico:
+          type: integer
+          description: Regione del medico
+        cod_regionale_medico:
+          type: string
+          description: Codice regionale del medico
+        asl_medico:
+          type: integer
+          description: Codice ASL del medico
+        distretto_medico:
+          type: integer
+          description: Distretto del medico
+        cod_aft_medico:
+          type: integer
+          description: Codice dell’AFT di appartenenza del medico
+        descrizione_aft_medico:
+          type: string
+          description: Descrizione dell’AFT di appartenenza del medico
+        totale_assistiti:
+          type: integer
+    Paziente:
+      type: object
+      required:
+        - nome
+        - cognome
+        - codice_fiscale
+        - cf_medico
+        - stato
+        - appuntamenti
+      properties:
+        nome:
+          type: string
+          description: Nome del paziente
+        cognome:
+          type: integer
+          description: Cognome del paziente
+        codice_fiscale:
+          type: string
+          description: Codice fiscale del paziente
+        cf_medico:
+          type: string
+          description: Codice fiscale del MMG che assiste il paziente
+        stato:
+          $ref: "#/components/schemas/StatoPaziente"
+        appuntamenti:
+          type: array
+          description: Lista di appuntamenti del paziente
+          items:
+            $ref: "#/components/schemas/Appuntamento"
+    Appuntamento:
+      type: object
+      description: Riferimenti dell'appuntamento
+      required:
+        - id
+        - data_appuntamento
+        - centro_spirometrico
+      properties:
+        id:
+          type: string
+          description: Identificativo Appuntamento
+        data_appuntamento:
+          type: string
+          format: date-time
+          description: Data appuntamento
+        centro_spirometrico:
+          type: string
+          description: Nome Centro Spirometrico
+        esito_sirometria:
+          enum:
+            - da-accettare
+            - fuori-norma
+            - a-norma
+        data_esito_spirometria:
+          type: string
+          format: date-time
+          description: Data esito spirometria
+        cf_medico_refertatore:
+          type: string
+          description: Codice Fiscale Medico Refertatore
+    ConfermaArruolamenti:
+      type: array
+      description: Conferma
+      items:
+        type: string
+        description: Codice Fiscale del paziente arruolato
+    ConfermaReferti:
+      type: array
+      description: Conferma
+      items:
+        type: object
+        properties:
+          codice_fiscale:
+            type: string
+            description: Codice Fiscale del paziente arruolato
+          id_appuntamento:
+            type: string
+            format: Identificativo dell'appuntamento
+
+    ErroreGestito:
+      type: object
+      required:
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    ServerError:
+      description: Errore interno del server
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroreGestito'
+    NotFound:
+      description: La risorsa non è stata trovata
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroreGestito'
+    PreconditionFailed:
+      description: Precondition Failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroreGestito'
+    Forbidden:
+      description: Non siete autorizzati a visualizzare la risorsa
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroreGestito'
+    Unauthorized:
+      description: Impossibile autenticare la richiesta
+
+  securitySchemes:
+    ApiKeyAuthorization:
+      type: apiKey
+      in: header
+      name: api-key
+      description: "Api Key for accessing the system"
+
+security:
+  - ApiKeyAuthorization: []
